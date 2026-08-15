@@ -18,7 +18,8 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           PROJECT_FILES = {
-              '.github/workflows/build.yml': 'name: Build APK\n\non:\n  workflow_dispatch:\n  push:\n    branches: [ "main" ]\n  pull_request:\n    branches: [ "main" ]\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n\n    steps:\n    - name: Checkout Repository\n      uses: actions/checkout@v4\n\n    - name: Set up JDK 17\n      uses: actions/setup-java@v4\n      with:\n        java-version: \'17\'\n        distribution: \'temurin\'\n\n    - name: Setup Gradle\n      uses: gradle/actions/setup-gradle@v4\n      with:\n        gradle-version: \'8.2\'\n\n    - name: Build with Gradle\n      run: gradle assembleDebug\n\n    - name: Upload Finished APK\n      uses: actions/upload-artifact@v4\n      with:\n        name: app-debug\n        path: app/build/outputs/apk/debug/\n',
+              # Do not generate .github/workflows/build.yml here: GitHub Actions' GITHUB_TOKEN
+              # cannot create or update workflow files unless it has the workflows permission.
               'codemagic.yaml': 'workflows:\n  default:\n    name: Build APK\n    scripts:\n      - gradle assembleDebug\n    artifacts:\n      - app/build/outputs/apk/debug/*.apk\n',
               'settings.gradle': "include ':app'\n",
               'build.gradle': "buildscript {\n    repositories {\n        google()\n        mavenCentral()\n    }\n    dependencies {\n        classpath 'com.android.tools.build:gradle:8.2.2'\n    }\n}\n\nallprojects {\n    repositories {\n        google()\n        mavenCentral()\n    }\n}\n\ntask clean(type: Delete) {\n    delete rootProject.buildDir\n}\n",
@@ -55,4 +56,3 @@ jobs:
             git commit -m "Bootstrap CaptureClip Android project"
             git push
           fi
-
